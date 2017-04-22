@@ -26,4 +26,10 @@ $app->group(['prefix' => 'api/v1'], function() use ($app) {
     $app->post('/', 'RequestController@store');
     $app->put('{id}', 'RequestController@update');
   });
+
+  $app->group(['prefix' => 'offers'], function() use ($app) {
+    $app->get('{id}/cancel', 'OfferController@cancel');
+    $app->post('/', 'OfferController@store');
+    $app->put('{id}', 'OfferController@update');
+  });
 });

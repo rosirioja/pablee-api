@@ -20,8 +20,6 @@ class CreateOffersTable extends Migration
         $table->unsignedInteger('trip_id');
         $table->float('reward', 8, 2);
         $table->unsignedInteger('status_id');
-        $table->unsignedInteger('created_by');
-        $table->unsignedInteger('modified_by');
         $table->timestamps();
       });
     }
