@@ -16,7 +16,14 @@ $app->get('/', function () use ($app) {
 });
 
 $app->group(['prefix' => 'api/v1'], function() use ($app) {
-  $app->get('requests', 'RequestController@index');
-  $app->get('requests/recent', 'RequestController@getRecent');
-  $app->post('requests', 'RequestController@store');
+
+  $app->group(['prefix' => 'requests'], function() use ($app) {
+    $app->get('/', 'RequestController@index');
+    $app->get('recent', 'RequestController@getRecent');
+    $app->get('{id}', 'RequestController@view');
+    $app->get('{id}/cancel', 'RequestController@cancel');
+
+    $app->post('/', 'RequestController@store');
+    $app->put('{id}', 'RequestController@update');
+  });
 });

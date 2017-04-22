@@ -26,16 +26,26 @@ class RequestController extends Controller
       return $this->successData($data, 200);
     }
 
-    public function index()
+    public function getRecent()
     {
       $data = RequestModel::orderBy('id', 'desc')->take(6)->get();
 
       return $this->successData($data, 200);
     }
 
+    public function view($id)
+    {
+      $data = RequestModel::find($id);
+      if (empty($data)) {
+        return $this->error('Invalid Request', 404);
+      }
+
+      return $this->successData($data, 200);
+    }
+
     public function store(Request $request)
     {
-      $this->validateRequest($request);
+      $this->_validateRequest($request);
 
       $price = $request->input('price');
       $reward = $request->input('reward');
@@ -52,7 +62,42 @@ class RequestController extends Controller
       return $this->success('Success', 201);
     }
 
-    public function validateRequest($request)
+    public function update(Request $request, $id)
+    {
+      $requestModel = RequestModel::find($id);
+      if (empty($requestModel)) {
+        return $this->error('Invalid Request', 404);
+      }
+
+      $this->_validateRequest($request);
+
+      $price = $request->input('price');
+      $reward = $request->input('reward');
+      $service_fee = ($price + $reward) * 0.1;
+      $total = $price + $reward + $service_fee;
+
+      $requestModel->fill($request->all());
+      $requestModel->service_fee = $service_fee;
+      $requestModel->total_amount = $total;
+      $requestModel->update();
+
+      return $this->success('Success', 201);
+    }
+
+    public function cancel($id)
+    {
+      $requestModel = RequestModel::find($id);
+      if (empty($requestModel)) {
+        return $this->error('Invalid Request', 404);
+      }
+
+      $requestModel->status_id = Status::ofName('cancelled')->id;
+      $requestModel->update();
+
+      return $this->success('Success', 201);
+    }
+
+    public function _validateRequest($request)
     {
       $rules = [
         'uuid' => 'required',
