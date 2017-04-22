@@ -87,8 +87,7 @@ class RequestController extends Controller
       return $this->success('Success', 201);
     }
 
-
-    public function acceptOffer(Request $request, $id)
+    public function postOffer(Request $request, $id)
     {
       $this->_validateOffer($request);
 
@@ -126,12 +125,13 @@ class RequestController extends Controller
       $total_price = $quantity * $price;
       $reward = $offer->reward;
       $service_fee = $this->computeServiceFee($total_price, $reward);
-      $total = $this->computeTotal($total_price, $reward, $service_fee);
+      $total = $this->computeTotal([$total_price, $reward, $service_fee]);
 
       // Insert into Payments Table
       $payment = new Payment;
       $payment->request_id = $id;
       $payment->offer_id = $offer_id;
+      $payment->type = 'cash-in';
       $payment->currency = $request->input('currency');
       $payment->quantity = $quantity;
       $payment->price = $price;
@@ -139,6 +139,43 @@ class RequestController extends Controller
       $payment->reward = $reward;
       $payment->service_fee = $service_fee;
       $payment->total_amount = $total;
+      $payment->save();
+
+      return $this->success('Success', 201);
+    }
+
+    public function postComplete(Request $request, $id)
+    {
+      $this->_validateComplete($request);
+
+      $requestModel = RequestModel::find($id);
+      if (empty($requestModel)) {
+        return $this->error('Invalid Request', 404);
+      }
+
+      // Unauth!
+      if ($request->input('uuid') != $requestModel->uuid) {
+        return $this->error('Unauthorized', 401);
+      }
+
+      // Update Request Status
+      $requestModel->status_id = Status::ofName('completed')->id;
+      $requestModel->update();
+
+      $shopper_payment = Payment::where('request_id', $id)->get()->first();
+
+      // Pay the Traveller
+      $payment = new Payment;
+      $payment->request_id = $id;
+      $payment->offer_id = $shopper_payment->offer_id;
+      $payment->type = 'payout';
+      $payment->currency = $request->input('currency');
+      $payment->quantity = $shopper_payment->quantity;
+      $payment->price = $shopper_payment->price;
+      $payment->total_price = $shopper_payment->total_price;
+      $payment->reward = $shopper_payment->reward;
+      $payment->service_fee = 0;
+      $payment->total_amount = $this->computeTotal([$shopper_payment->total_price, $shopper_payment->reward]);
       $payment->save();
 
       return $this->success('Success', 201);
@@ -179,11 +216,10 @@ class RequestController extends Controller
       $this->validate($request, $rules);
     }
 
-    public function _validateOffer($request = [])
+    public function _validateComplete($request = [])
     {
       $rules = [
         'uuid' => 'required',
-        'offer_id' => 'required|numeric',
         'currency' => 'required'
       ];
 

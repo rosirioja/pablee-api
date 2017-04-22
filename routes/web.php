@@ -25,7 +25,8 @@ $app->group(['prefix' => 'api/v1'], function() use ($app) {
     $app->post('/', 'RequestController@store');
     $app->put('{id}', 'RequestController@update');
 
-    $app->post('{id}/offer', 'RequestController@acceptOffer');
+    $app->post('{id}/offer', 'RequestController@postOffer');
+    $app->post('{id}/complete', 'RequestController@postComplete');
     $app->put('{id}/status', 'RequestController@updateStatus');
   });
 

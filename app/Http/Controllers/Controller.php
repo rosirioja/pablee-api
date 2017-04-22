@@ -24,9 +24,12 @@ class Controller extends BaseController
     return $service_fee;
   }
 
-  public function computeTotal($total_price = 0, $reward = 0, $service_fee = 0)
+  public function computeTotal($addends = [])
   {
-    $total = $total_price + $reward + $service_fee;
+    $total = 0;
+    foreach ($addends as $row) {
+      $total += $row;
+    }
     return $total;
   }
 }
