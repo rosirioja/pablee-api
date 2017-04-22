@@ -32,4 +32,6 @@ $app->group(['prefix' => 'api/v1'], function() use ($app) {
     $app->post('/', 'OfferController@store');
     $app->put('{id}', 'OfferController@update');
   });
+
+  $app->get('trips/recent', 'TripController@getRecent');
 });
