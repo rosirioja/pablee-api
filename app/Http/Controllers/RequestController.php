@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Request as RequestModel;
 use App\Models\Status;
+use App\Models\Offer;
+use DB;
 
 class RequestController extends Controller
 {
@@ -28,17 +30,31 @@ class RequestController extends Controller
 
     public function getRecent()
     {
-      $data = RequestModel::orderBy('id', 'desc')->take(6)->get();
+      $open_id = Status::ofName('open')->id;
+      $offered_id = Status::ofName('offered')->id;
+
+      $data = DB::select("SELECT * FROM requests r WHERE r.status_id = {$open_id} OR r.status_id = {$offered_id} order by r.id desc limit 6");
 
       return $this->successData($data, 200);
     }
 
     public function view($id)
     {
-      $data = RequestModel::find($id);
-      if (empty($data)) {
+      $request = RequestModel::find($id);
+
+      if (empty($request)) {
         return $this->error('Invalid Request', 404);
       }
+
+      $request = DB::select("SELECT r.*, s.display_name as status FROM requests r LEFT JOIN status s ON r.status_id = s.id WHERE r.id = {$id}");
+
+      // $offers = Offer::where('request_id', $id)->get();
+      $offers = DB::select("SELECT o.*, s.display_name as status, t.travel_from, t.travel_to FROM offers o LEFT JOIN status s ON o.status_id = s.id LEFT JOIN trips t ON t.id = o.trip_id");
+
+      $data = [
+        'request' => $request,
+        'offers' => $offers
+      ];
 
       return $this->successData($data, 200);
     }
@@ -106,9 +122,11 @@ class RequestController extends Controller
         'link' => 'required',
         'image_url' => 'required',
         'quantity' => 'required|integer',
+        'currency' => 'required',
         'price' => 'required|numeric',
         'reward' => 'required|numeric',
-        'location' => 'required',
+        'deliver_from' => 'required',
+        'deliver_to' => 'required',
         // 'needed_at' optional
       ];
 
