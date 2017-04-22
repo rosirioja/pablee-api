@@ -113,6 +113,19 @@ class RequestController extends Controller
       return $this->success('Success', 201);
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+      $requestModel = RequestModel::find($id);
+      if (empty($requestModel)) {
+        return $this->error('Invalid Request', 404);
+      }
+
+      $requestModel->status_id = Status::ofName($request->input('status_name'))->id;
+      $requestModel->update();
+
+      return $this->success('Success', 201);
+    }
+
     public function _validateRequest($request)
     {
       $rules = [
