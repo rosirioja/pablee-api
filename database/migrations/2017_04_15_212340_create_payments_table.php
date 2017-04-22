@@ -18,6 +18,11 @@ class CreatePaymentsTable extends Migration
             $table->unsignedInteger('request_id');
             $table->unsignedInteger('offer_id');
             $table->string('currency');
+            $table->unsignedInteger('quantity');
+            $table->float('price', 8, 2);
+            $table->float('total_price', 8, 2);
+            $table->float('reward', 8, 2);
+            $table->float('service_fee', 8, 2);
             $table->float('total_amount', 8, 2);
             $table->unsignedInteger('created_by');
             $table->unsignedInteger('modified_by');

@@ -23,9 +23,7 @@ class CreateRequestsTable extends Migration
         $table->unsignedInteger('quantity');
         $table->string('currency');
         $table->float('price', 8, 2);
-        $table->float('reward', 8, 2);
-        $table->float('service_fee', 8, 2);
-        $table->float('total_amount', 8, 2);
+        $table->float('reward', 8, 2);        
         $table->string('deliver_from');
         $table->string('deliver_to');
         $table->datetime('needed_at');
