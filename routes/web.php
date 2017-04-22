@@ -17,5 +17,6 @@ $app->get('/', function () use ($app) {
 
 $app->group(['prefix' => 'api/v1'], function() use ($app) {
   $app->get('requests', 'RequestController@index');
-  $app->post('requests', 'RequestController@store');  
+  $app->get('requests/recent', 'RequestController@getRecent');
+  $app->post('requests', 'RequestController@store');
 });

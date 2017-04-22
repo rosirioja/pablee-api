@@ -21,6 +21,13 @@ class RequestController extends Controller
 
     public function index()
     {
+      $data = RequestModel::all();
+
+      return $this->successData($data, 200);
+    }
+
+    public function index()
+    {
       $data = RequestModel::orderBy('id', 'desc')->take(6)->get();
 
       return $this->successData($data, 200);
