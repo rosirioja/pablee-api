@@ -21,7 +21,9 @@ class RequestController extends Controller
 
     public function index()
     {
-      return "annyeong";
+      $data = RequestModel::orderBy('id', 'desc')->take(6)->get();
+
+      return $this->successData($data, 200);
     }
 
     public function store(Request $request)
