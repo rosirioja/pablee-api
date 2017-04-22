@@ -16,9 +16,9 @@ class CreateTripsTable extends Migration
         Schema::create('trips', function (Blueprint $table) {
             $table->increments('id');
             $table->string('uuid');
-            $table->string('origin');
-            $table->string('destination');
-            $table->datetime('travel_at');
+            $table->string('travel_from');
+            $table->string('travel_to');
+            $table->datetime('travel_date');
             $table->timestamps();
         });
     }

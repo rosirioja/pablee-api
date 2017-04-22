@@ -21,13 +21,15 @@ class CreateRequestsTable extends Migration
         $table->string('link');
         $table->string('image_url');
         $table->unsignedInteger('quantity');
+        $table->string('currency');
         $table->float('price', 8, 2);
         $table->float('reward', 8, 2);
         $table->float('service_fee', 8, 2);
         $table->float('total_amount', 8, 2);
-        $table->string('location');
+        $table->string('deliver_from');
+        $table->string('deliver_to');
         $table->datetime('needed_at');
-        $table->unsignedInteger('status_id');        
+        $table->unsignedInteger('status_id');
         $table->timestamps();
       });
     }
