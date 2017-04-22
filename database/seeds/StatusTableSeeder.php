@@ -38,7 +38,7 @@ class StatusTableSeeder extends Seeder
 
         DB::table('status')->insert([
           'display_name' => 'On Delivery',
-          'name' => 'On_delivery'
+          'name' => 'on_delivery'
         ]);
 
         DB::table('status')->insert([
@@ -59,6 +59,11 @@ class StatusTableSeeder extends Seeder
         DB::table('status')->insert([
           'display_name' => 'Rejected',
           'name' => 'rejected'
+        ]);
+
+        DB::table('status')->insert([
+          'display_name' => 'Cancelled',
+          'name' => 'cancelled'
         ]);
     }
 }
