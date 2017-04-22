@@ -24,8 +24,6 @@ class CreatePaymentsTable extends Migration
             $table->float('reward', 8, 2);
             $table->float('service_fee', 8, 2);
             $table->float('total_amount', 8, 2);
-            $table->unsignedInteger('created_by');
-            $table->unsignedInteger('modified_by');
             $table->timestamps();
         });
     }
