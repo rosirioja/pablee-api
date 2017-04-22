@@ -14,8 +14,8 @@ class CreateRequestsTable extends Migration
     public function up()
     {
       Schema::create('requests', function (Blueprint $table) {
-        $table->string('uuid');
         $table->increments('id');
+        $table->string('uuid');
         $table->string('title');
         $table->text('description');
         $table->string('link');
@@ -27,9 +27,7 @@ class CreateRequestsTable extends Migration
         $table->float('total_amount', 8, 2);
         $table->string('location');
         $table->datetime('needed_at');
-        $table->unsignedInteger('status_id');
-        $table->unsignedInteger('created_by');
-        $table->unsignedInteger('modified_by');
+        $table->unsignedInteger('status_id');        
         $table->timestamps();
       });
     }
