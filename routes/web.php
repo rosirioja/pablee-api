@@ -14,3 +14,8 @@
 $app->get('/', function () use ($app) {
     return $app->version();
 });
+
+$app->group(['prefix' => 'api/v1'], function() use ($app) {
+  $app->get('requests', 'RequestController@index');
+  $app->post('requests', 'RequestController@store');  
+});
