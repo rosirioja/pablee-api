@@ -21,7 +21,6 @@ $app->group(['prefix' => 'api/v1'], function() use ($app) {
     $app->get('/', 'RequestController@index');
     $app->get('recent', 'RequestController@getRecent');
     $app->get('{id}', 'RequestController@view');
-    $app->get('{id}/cancel', 'RequestController@cancel');
 
     $app->post('/', 'RequestController@store');
     $app->put('{id}', 'RequestController@update');

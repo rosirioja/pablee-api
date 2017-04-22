@@ -87,18 +87,6 @@ class RequestController extends Controller
       return $this->success('Success', 201);
     }
 
-    public function cancel($id)
-    {
-      $requestModel = RequestModel::find($id);
-      if (empty($requestModel)) {
-        return $this->error('Invalid Request', 404);
-      }
-
-      $requestModel->status_id = Status::ofName('cancelled')->id;
-      $requestModel->update();
-
-      return $this->success('Success', 201);
-    }
 
     public function acceptOffer(Request $request, $id)
     {
