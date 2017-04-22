@@ -17,11 +17,8 @@ class CreateOffersTable extends Migration
         $table->increments('id');
         $table->string('uuid');
         $table->unsignedInteger('request_id');
+        $table->unsignedInteger('trip_id');
         $table->float('reward', 8, 2);
-        $table->string('origin');
-        $table->string('destination');
-        $table->datetime('origin_date');
-        $table->datetime('destination_date');
         $table->unsignedInteger('status_id');
         $table->unsignedInteger('created_by');
         $table->unsignedInteger('modified_by');
