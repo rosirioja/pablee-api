@@ -17,6 +17,7 @@ class CreatePaymentsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('request_id');
             $table->unsignedInteger('offer_id');
+            $table->string('type');
             $table->string('currency');
             $table->unsignedInteger('quantity');
             $table->float('price', 8, 2);
