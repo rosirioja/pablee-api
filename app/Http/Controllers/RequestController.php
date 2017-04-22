@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Request as RequestModel;
 use App\Models\Status;
 use App\Models\Offer;
+use App\Models\Payment;
 use DB;
 
 class RequestController extends Controller
@@ -63,15 +64,8 @@ class RequestController extends Controller
     {
       $this->_validateRequest($request);
 
-      $price = $request->input('price');
-      $reward = $request->input('reward');
-      $service_fee = ($price + $reward) * 0.1;
-      $total = $price + $reward + $service_fee;
-
       $requestModel =  new RequestModel;
       $requestModel->fill($request->all());
-      $requestModel->service_fee = $service_fee;
-      $requestModel->total_amount = $total;
       $requestModel->status_id = Status::ofName('open')->id;
       $requestModel->save();
 
@@ -87,14 +81,7 @@ class RequestController extends Controller
 
       $this->_validateRequest($request);
 
-      $price = $request->input('price');
-      $reward = $request->input('reward');
-      $service_fee = ($price + $reward) * 0.1;
-      $total = $price + $reward + $service_fee;
-
       $requestModel->fill($request->all());
-      $requestModel->service_fee = $service_fee;
-      $requestModel->total_amount = $total;
       $requestModel->update();
 
       return $this->success('Success', 201);
@@ -113,6 +100,62 @@ class RequestController extends Controller
       return $this->success('Success', 201);
     }
 
+    public function acceptOffer(Request $request, $id)
+    {
+      $this->_validateOffer($request);
+
+      $requestModel = RequestModel::find($id);
+      if (empty($requestModel)) {
+        return $this->error('Invalid Request', 404);
+      }
+
+      // Unauth!
+      if ($request->input('uuid') != $requestModel->uuid) {
+        return $this->error('Unauthorized', 401);
+      }
+
+      $offer_id = $request->input('offer_id');
+      $offer = Offer::find($offer_id);
+      if (empty($offer)) {
+        return $this->error('Invalid Offer', 404);
+      }
+
+      // Update Request Status
+      $requestModel->status_id = Status::ofName('on_purchase')->id;
+      $requestModel->update();
+
+      // Set all offers as rejected
+      Offer::where('request_id', $id)->update([
+        'status_id' => Status::ofName('rejected')->id
+      ]);
+
+      // Set chosen offer as accepted
+      $offer->status_id = Status::ofName('accepted')->id;
+      $offer->update();
+
+      $quantity = $requestModel->quantity;
+      $price = $requestModel->price;
+      $total_price = $quantity * $price;
+      $reward = $offer->reward;
+      $service_fee = $this->computeServiceFee($total_price, $reward);
+      $total = $this->computeTotal($total_price, $reward, $service_fee);
+
+      // Insert into Payments Table
+      $payment = new Payment;
+      $payment->request_id = $id;
+      $payment->offer_id = $offer_id;
+      $payment->currency = $request->input('currency');
+      $payment->quantity = $quantity;
+      $payment->price = $price;
+      $payment->total_price = $total_price;
+      $payment->reward = $reward;
+      $payment->service_fee = $service_fee;
+      $payment->total_amount = $total;
+      $payment->save();
+
+      return $this->success('Success', 201);
+    }
+
     public function updateStatus(Request $request, $id)
     {
       $requestModel = RequestModel::find($id);
@@ -120,19 +163,21 @@ class RequestController extends Controller
         return $this->error('Invalid Request', 404);
       }
 
-      $requestModel->status_id = Status::ofName($request->input('status_name'))->id;
+      $status = $request->input('status_name');
+
+      $requestModel->status_id = Status::ofName($status)->id;
       $requestModel->update();
 
       return $this->success('Success', 201);
     }
 
-    public function _validateRequest($request)
+    public function _validateRequest($request = [])
     {
       $rules = [
         'uuid' => 'required',
         'title' => 'required',
         'description' => 'required',
-        'link' => 'required',
+        // 'link' optional
         'image_url' => 'required',
         'quantity' => 'required|integer',
         'currency' => 'required',
@@ -144,6 +189,16 @@ class RequestController extends Controller
       ];
 
       $this->validate($request, $rules);
+    }
 
+    public function _validateOffer($request = [])
+    {
+      $rules = [
+        'uuid' => 'required',
+        'offer_id' => 'required|numeric',
+        'currency' => 'required'
+      ];
+
+      $this->validate($request, $rules);
     }
 }

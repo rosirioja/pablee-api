@@ -22,10 +22,12 @@ $app->group(['prefix' => 'api/v1'], function() use ($app) {
     $app->get('recent', 'RequestController@getRecent');
     $app->get('{id}', 'RequestController@view');
     $app->get('{id}/cancel', 'RequestController@cancel');
-    $app->put('{id}/status', 'RequestController@updateStatus');
 
     $app->post('/', 'RequestController@store');
     $app->put('{id}', 'RequestController@update');
+
+    $app->post('{id}/offer', 'RequestController@acceptOffer');
+    $app->put('{id}/status', 'RequestController@updateStatus');
   });
 
   $app->group(['prefix' => 'offers'], function() use ($app) {
