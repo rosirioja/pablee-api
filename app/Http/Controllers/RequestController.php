@@ -29,6 +29,14 @@ class RequestController extends Controller
       return $this->successData($data, 200);
     }
 
+    public function getSearch($keyword)
+    {
+      $keyword = urldecode($keyword);
+      $data = RequestModel::where('title', 'like', "%{$keyword}%")->orWhere('deliver_from', 'like', "%{$keyword}%")->orWhere('deliver_to', 'like', "%{$keyword}%")->get();
+
+      return $this->successData($data, 200);
+    }
+
     public function getRecent()
     {
       $open_id = Status::ofName('open')->id;
