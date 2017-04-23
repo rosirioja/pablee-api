@@ -13,6 +13,9 @@ COPY . /pablee
 
 RUN cd /pablee && composer -n install --no-plugins --no-scripts
 
+RUN php artisan migrate
+RUN php artisan db:seed
+
 EXPOSE 8000
 
 CMD ["php", "-S", "0.0.0.0:8000", "-t", "public/"]
