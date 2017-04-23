@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  app:
+    build: .
+    command: php -S 0.0.0.0:8000 -t public/
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    links:
+      - pablee-api-db
+    environment:
+      - NODE_ENV=development
+
+  pablee-api-db:
+    image: mysql:5.6
+    ports:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "pablee"
+      MYSQL_PASSWORD: "pablee"
+      MYSQL_DATABASE: "pablee"
+
